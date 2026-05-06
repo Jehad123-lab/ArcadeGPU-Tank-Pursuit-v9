@@ -115,6 +115,10 @@ export class GameScreen extends Screen {
        
        // Limit pitch to avoid flipping over and going way below ground
        this.cameraPitch = Math.max(-0.1, Math.min(Math.PI / 2 - 0.1, this.cameraPitch));
+       
+       // Force cameraYaw to stay within bounds to avoid wrapping overhead
+       while (this.cameraYaw > Math.PI * 2) this.cameraYaw -= Math.PI * 2;
+       while (this.cameraYaw < -Math.PI * 2) this.cameraYaw += Math.PI * 2;
     }
   };
 

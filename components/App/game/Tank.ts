@@ -217,27 +217,25 @@ export class Tank {
 
     // Turret follows body tilt but has independent yaw
     // We want the turret to smoothly turn to face cameraYaw.
-    // Calculate the shortest angle path
     let yawDiff = cameraYaw - this.turretYaw;
     while (yawDiff > Math.PI) yawDiff -= Math.PI * 2;
     while (yawDiff < -Math.PI) yawDiff += Math.PI * 2;
     
-    const turretTraverseSpeed = 1.5; // rad per second
-    const traverseAmount = turretTraverseSpeed * (ts / 1000);
+    // Smooth damp towards target yaw to avoid snapping bugs
+    const turretTraverseSpeed = 6.0; // Snappy traverse
+    this.turretYaw += yawDiff * Math.min(1.0, turretTraverseSpeed * (ts / 1000));
     
-    if (Math.abs(yawDiff) < traverseAmount) {
-        this.turretYaw = cameraYaw;
-    } else {
-        this.turretYaw += Math.sign(yawDiff) * traverseAmount;
-    }
+    // Normalize turretYaw to keep it reasonably small
+    while (this.turretYaw > Math.PI * 2) this.turretYaw -= Math.PI * 2;
+    while (this.turretYaw < -Math.PI * 2) this.turretYaw += Math.PI * 2;
     
     const localYaw = (this.turretYaw - this.rotation);
     const localYawQ = Quaternion.createFromEuler(localYaw, 0, 0, 'YXZ');
     const turretQ = Quaternion.multiply(q, localYawQ);
     
     // Apply pitch exclusively to the barrel/turret gun
-    // Note: To pitch up, we rotate around X axis.
-    const pitchQ = Quaternion.createFromEuler(0, cameraPitch, 0, 'YXZ'); // pitch is X axis rotation
+    // Note: cameraPitch looks down when positive. We need negative to pitch barrel down.
+    const pitchQ = Quaternion.createFromEuler(0, -cameraPitch, 0, 'YXZ'); // pitch is X axis rotation
     const barrelQ = Quaternion.multiply(turretQ, pitchQ);
 
     const turretOffset = q.rotateVector([0, 0.675, 0]);

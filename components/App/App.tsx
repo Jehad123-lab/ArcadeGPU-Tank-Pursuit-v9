@@ -186,6 +186,12 @@ const App = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+            
+            {isReady && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-50 text-white z-40 drop-shadow-md">
+                    <Target size={32} />
+                </div>
+            )}
 
             <div className="absolute top-8 left-8 pointer-events-auto">
                 <h1 className="text-4xl font-bebas text-white drop-shadow-lg tracking-wider">TANK COMMAND</h1>
